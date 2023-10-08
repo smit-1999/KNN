@@ -67,7 +67,7 @@ def one_nn(df:pd.DataFrame):
         y_train = train_actual['Prediction']
         metrics.append(get_metrics(y_train,test['Y_pred']))
     print('Metrics for 5 fold validation:', metrics)
-    with open('./dataset/output.txt', 'w') as f: 
+    with open('./dataset/output.txt', 'a') as f: 
         for k in metrics:
             f.write(' '.join([str(i)for i in k]) + " " + str(datetime.now()) + "\n")
 
@@ -99,7 +99,7 @@ def knn(df:pd.DataFrame, k: int)->None:
         y_train = train_actual['Prediction']
         metrics.append(get_metrics(y_train,test['Y_pred']))
     print('Metrics for 5 fold validation:', metrics)
-    with open('./dataset/output.txt', 'w') as f: 
+    with open('./dataset/output.txt', 'a') as f: 
         for k in metrics:
             f.write(' '.join([str(i)for i in k]) + " " + str(datetime.now()) + "\n")
 
@@ -143,6 +143,9 @@ if __name__ == "__main__":
 
 
     #one_nn(df)
-    knn(df, 3)
+    k = 1
+    while k <= 7:
+        knn(df, k)
+        k += 2
     
     
