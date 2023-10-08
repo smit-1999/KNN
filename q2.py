@@ -66,8 +66,8 @@ def one_nn(df:pd.DataFrame):
         accuracy.append(get_accuracy(y_train,test['Y_pred']))
     print('Metrics for 5 fold validation:', accuracy)
     with open('./dataset/output.txt', 'w') as f: 
-        for k in accuracy.items():
-            f.write(' '.join([str(i)for i in k]) + " " + datetime.now() + "\n")
+        for k in accuracy:
+            f.write(' '.join([str(i)for i in k]) + " " + datetime.now() + "\n")    
 
 def compute_distance_matrix(df: pd.DataFrame) -> None:
     prev=time.time()
