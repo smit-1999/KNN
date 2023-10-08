@@ -16,16 +16,11 @@ def dist(p1,p2):
     updated_p2 = p2[1:]#np.delete(p2,0)
     updated_p2[updated_p2 == ''] = 0.0
     updated_p2 = updated_p2.astype(float)
-    #print(updated_p1,updated_p2)
-
-    # for i in range(1,len(updated_p1)):
-    #     res  += (int(p1[i]) - int(p2[i]))**2
     res = np.sqrt(np.sum((updated_p1-updated_p2)**2))
 
     return res
 
-def get_accuracy(train,test):
-    
+def get_accuracy(train,test):    
     tp = 0 
     tn = 0
     fp = 0 
@@ -60,8 +55,6 @@ def one_nn(df):
         y_pred.append(label)
     test['Y_pred'] = y_pred
     acc = get_accuracy(train,test)
-    print('accuracy',acc)
-    #print(test['Y_pred'],train['Prediction'])
 
 def compute_distance_matrix(df):
     prev=time.time()
@@ -78,10 +71,6 @@ def compute_distance_matrix(df):
             print('Completed distance calulation for 5points', i-5,'to',i, 'in ', time.time()-prev,'s')
             prev=time.time()
     file = './dataset/distances.txt'
-    # with open(file, 'w') as f: 
-    #     json.dump(dp, f)
-    # with open('./dataset/distances.txt', 'w') as f: 
-    #     pickle.dumps(dp.items(),f)
     print('Completed distance calculation for all points in ', time.time()-start,'s')
     with open(file, 'w') as f: 
         for k,v in dp.items():
@@ -94,7 +83,5 @@ if __name__ == "__main__":
     df.rename(columns=df.iloc[0], inplace = True)
     df.drop(df.index[0], inplace = True)
     compute_distance_matrix(df)
-
-    # one_nn(df)
     
     
