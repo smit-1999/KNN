@@ -1,11 +1,10 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-import math
-import json,pickle
 import time
 import os
 from collections import defaultdict
+
 dp = defaultdict()
 
 def dist(p1,p2):    
@@ -68,7 +67,6 @@ def compute_distance_matrix(df: pd.DataFrame) -> None:
             distance = dist(p1,p2)
             dp[(i,j)] = distance if (i,j) not in dp.keys() else distance
             dp[(j,i)] = distance if (j,i) not in dp.keys() else distance
-        #print('Completed distance calulation for ', i, 'in ', end-start,'s')
         if i % 100 == 0:
             print('Completed distance calulation for 5points', i-5,'to',i, 'in ', time.time()-prev,'s')
             prev=time.time()
@@ -89,7 +87,6 @@ if __name__ == "__main__":
             for line in f:
                 x , y, val = line.split(" ")
                 dp[(int(x),int(y))] = float(val)
-        print(dp[(0,1)],dp[(1,0)]) 
     else:    
         compute_distance_matrix(df)
     
