@@ -76,17 +76,22 @@ def compute_distance_matrix(df: pd.DataFrame) -> None:
         for k,v in dp.items():
             f.write(' '.join([str(i)for i in k]) + ' ' + str(v) + "\n")
     
+def populate_distance_matrix(file: str)-> None:
+    with open(file, 'r') as f: 
+        for line in f:
+            x , y, val = line.split(" ")
+            dp[(int(x),int(y))] = float(val)
 
 if __name__ == "__main__":
     df = pd.read_csv('./dataset/emails.csv', sep=",",                
                     header=None, low_memory=False)  
+    # set first row in input file as columns of dataframe
     df.rename(columns=df.iloc[0], inplace = True)
     df.drop(df.index[0], inplace = True)
+    
     if os.path.exists('./dataset/distances.txt'):
-        with open('./dataset/distances.txt', 'r') as f: 
-            for line in f:
-                x , y, val = line.split(" ")
-                dp[(int(x),int(y))] = float(val)
+        #if distance matrix exists, store it in dp array
+        populate_distance_matrix('./dataset/distances.txt')   
     else:    
         compute_distance_matrix(df)
     
