@@ -6,6 +6,7 @@ import os
 from collections import defaultdict
 from datetime import datetime
 dp = defaultdict()
+from collections import Counter
 
 def dist(p1,p2):    
     res = 0
@@ -23,7 +24,7 @@ def dist(p1,p2):
 
     return res
 
-def get_accuracy(y_actual : pd.DataFrame, y_pred: pd.DataFrame) -> float:    
+def get_metrics(y_actual : pd.DataFrame, y_pred: pd.DataFrame) -> float:    
     tp = 0 
     tn = 0
     fp = 0 
@@ -39,6 +40,7 @@ def get_accuracy(y_actual : pd.DataFrame, y_pred: pd.DataFrame) -> float:
                 tn += 1
             else:
                 fn += 1
+    print(tp,fp,tn,fn)
     accuracy = (tp+tn)/(tp+tn+fp+fn)
     precision = (tp)/(tp+fn)
     recall = (tp)/(tp+fp)
@@ -46,7 +48,7 @@ def get_accuracy(y_actual : pd.DataFrame, y_pred: pd.DataFrame) -> float:
 
 def one_nn(df:pd.DataFrame):
     #5 fold validation
-    accuracy = []
+    metrics = []
     for i in range(0,5):
         test = df.iloc[(i*1000):1000*(i+1)]
         train = pd.concat([df,test]).drop_duplicates(keep=False)
@@ -63,11 +65,43 @@ def one_nn(df:pd.DataFrame):
         test['Y_pred'] = y_pred
         train_actual = df.iloc[(i*1000):1000*(i+1)]
         y_train = train_actual['Prediction']
-        accuracy.append(get_accuracy(y_train,test['Y_pred']))
-    print('Metrics for 5 fold validation:', accuracy)
+        metrics.append(get_metrics(y_train,test['Y_pred']))
+    print('Metrics for 5 fold validation:', metrics)
     with open('./dataset/output.txt', 'w') as f: 
-        for k in accuracy:
-            f.write(' '.join([str(i)for i in k]) + " " + datetime.now() + "\n")    
+        for k in metrics:
+            f.write(' '.join([str(i)for i in k]) + " " + str(datetime.now()) + "\n")
+
+def knn(df:pd.DataFrame, k: int)->None:
+    metrics = []
+    # df=df.head(50)
+    for i in range(0,5):
+        test = df.iloc[(i*1000):1000*(i+1)]
+        train = pd.concat([df,test]).drop_duplicates(keep=False)
+        y_pred = []
+        print(i,'th fold')
+        for x,test_point in test.iterrows():
+            label = '1'
+            all_distances=[]
+            for y,train_point in train.iterrows():
+                curr_dist = dp[(x-1,y-1)]
+                label = train_point['Prediction']
+                all_distances.append((curr_dist,label))
+            topK = sorted(all_distances, key = lambda x: x[0])[:k] 
+            #print('Top kdistances',topK)
+            freq = Counter(elem[1] for elem in topK)
+            label = '1' if freq['1'] > freq['0'] else '0'
+            #print('freq dict', freq)
+            #print('pred label', label)
+            y_pred.append(label)
+        #print('For i=',i , 'pred:',y_pred)
+        test['Y_pred'] = y_pred
+        train_actual = df.iloc[(i*1000):1000*(i+1)]
+        y_train = train_actual['Prediction']
+        metrics.append(get_metrics(y_train,test['Y_pred']))
+    print('Metrics for 5 fold validation:', metrics)
+    with open('./dataset/output.txt', 'w') as f: 
+        for k in metrics:
+            f.write(' '.join([str(i)for i in k]) + " " + str(datetime.now()) + "\n")
 
 def compute_distance_matrix(df: pd.DataFrame) -> None:
     prev=time.time()
@@ -93,7 +127,7 @@ def populate_distance_matrix(file: str)-> None:
         for line in f:
             x , y, val = line.split(" ")
             dp[(int(x),int(y))] = float(val)
-
+    
 if __name__ == "__main__":
     df = pd.read_csv('./dataset/emails.csv', sep=",",                
                     header=None, low_memory=False)  
@@ -108,6 +142,7 @@ if __name__ == "__main__":
         compute_distance_matrix(df)
 
 
-    one_nn(df)
+    #one_nn(df)
+    knn(df, 3)
     
     
