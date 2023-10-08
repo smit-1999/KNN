@@ -42,23 +42,27 @@ def get_accuracy(train : pd.DataFrame, test: pd.DataFrame) -> float:
     return (tp+tn)/(tp+tn+fp+fn)
 
 def one_nn(df:pd.DataFrame):
-    test = df.iloc[0:1000]
-    train = df.iloc[1000:5001] 
-    y_pred = []
-    for x,test_point in test.iterrows():
-        min_dist = 10**15       
-        label = '1'
-        for y,train_point in train.iterrows():
-            curr_dist = dp[(x-1,y-1)]
-            min_dist = min(min_dist,curr_dist)
-            if min_dist == curr_dist:
-                label = train_point['Prediction']
-        y_pred.append(label)
-    test['Y_pred'] = y_pred
-    train_actual = df.iloc[0:1000]
-    y_train = train_actual['Prediction']
-    acc = get_accuracy(y_train,test['Y_pred'])
-    print(acc)
+    #5 fold validation
+    accuracy = []
+    for i in range(0,5):
+        test = df.iloc[(i*10):10*(i+1)]
+        train = pd.concat([df,test]).drop_duplicates(keep=False) #df.iloc[1000:5001] 
+        #print(train, test)
+        y_pred = []
+        for x,test_point in test.iterrows():
+            min_dist = 10**15       
+            label = '1'
+            for y,train_point in train.iterrows():
+                curr_dist = dp[(x-1,y-1)]
+                min_dist = min(min_dist,curr_dist)
+                if min_dist == curr_dist:
+                    label = train_point['Prediction']
+            y_pred.append(label)
+        test['Y_pred'] = y_pred
+        train_actual = df.iloc[(i*10):10*(i+1)]
+        y_train = train_actual['Prediction']
+        accuracy.append(get_accuracy(y_train,test['Y_pred']))
+    print('Accuracy for 5 fold validation:', np.average(accuracy))
 
 def compute_distance_matrix(df: pd.DataFrame) -> None:
     prev=time.time()
@@ -99,6 +103,6 @@ if __name__ == "__main__":
         compute_distance_matrix(df)
 
 
-    one_nn(df)
+    one_nn(df.head(50))
     
     
