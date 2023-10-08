@@ -4,7 +4,9 @@ import numpy as np
 import math
 import json,pickle
 import time
-dp = {}
+import os
+from collections import defaultdict
+dp = defaultdict()
 
 def dist(p1,p2):    
     res = 0
@@ -20,7 +22,7 @@ def dist(p1,p2):
 
     return res
 
-def get_accuracy(train,test):    
+def get_accuracy(train : pd.DataFrame, test: pd.DataFrame) -> float:    
     tp = 0 
     tn = 0
     fp = 0 
@@ -56,7 +58,7 @@ def one_nn(df):
     test['Y_pred'] = y_pred
     acc = get_accuracy(train,test)
 
-def compute_distance_matrix(df):
+def compute_distance_matrix(df: pd.DataFrame) -> None:
     prev=time.time()
     start=time.time()
     for i in range(0, len(df)):
@@ -82,6 +84,13 @@ if __name__ == "__main__":
                     header=None, low_memory=False)  
     df.rename(columns=df.iloc[0], inplace = True)
     df.drop(df.index[0], inplace = True)
-    compute_distance_matrix(df)
+    if os.path.exists('./dataset/distances.txt'):
+        with open('./dataset/distances.txt', 'r') as f: 
+            for line in f:
+                x , y, val = line.split(" ")
+                dp[(int(x),int(y))] = float(val)
+        print(dp[(0,1)],dp[(1,0)]) 
+    else:    
+        compute_distance_matrix(df)
     
     
