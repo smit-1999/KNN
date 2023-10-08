@@ -45,9 +45,8 @@ def one_nn(df:pd.DataFrame):
     #5 fold validation
     accuracy = []
     for i in range(0,5):
-        test = df.iloc[(i*10):10*(i+1)]
-        train = pd.concat([df,test]).drop_duplicates(keep=False) #df.iloc[1000:5001] 
-        #print(train, test)
+        test = df.iloc[(i*1000):1000*(i+1)]
+        train = pd.concat([df,test]).drop_duplicates(keep=False)
         y_pred = []
         for x,test_point in test.iterrows():
             min_dist = 10**15       
@@ -59,7 +58,7 @@ def one_nn(df:pd.DataFrame):
                     label = train_point['Prediction']
             y_pred.append(label)
         test['Y_pred'] = y_pred
-        train_actual = df.iloc[(i*10):10*(i+1)]
+        train_actual = df.iloc[(i*1000):1000*(i+1)]
         y_train = train_actual['Prediction']
         accuracy.append(get_accuracy(y_train,test['Y_pred']))
     print('Accuracy for 5 fold validation:', np.average(accuracy))
@@ -103,6 +102,6 @@ if __name__ == "__main__":
         compute_distance_matrix(df)
 
 
-    one_nn(df.head(50))
+    one_nn(df)
     
     
