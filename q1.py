@@ -12,14 +12,15 @@ def plot(df, test_points):
     plt.legend
     plt.show()
 
+def dist(p1,p2):
+    return math.sqrt((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2)
+
 def generate_test_points():
     return pd.DataFrame([[round(r,2),round(c,2)] for r in np.arange(-2.0,2.1,0.1) for c in np.arange(-2.0,2.1,0.1)])
 if __name__ == "__main__":
     df = pd.read_csv('./dataset/D2z.txt', sep=" ",                
                     header=None, names=["X1", "X2", "Y"])    
     test_points = generate_test_points()
-    def dist(p1,p2):
-        return math.sqrt((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2)
     
     y_labels = []
     for _index,tp in test_points.iterrows():
