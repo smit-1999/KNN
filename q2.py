@@ -4,7 +4,7 @@ import numpy as np
 import time
 import os
 from collections import defaultdict
-
+from datetime import datetime
 dp = defaultdict()
 
 def dist(p1,p2):    
@@ -23,23 +23,26 @@ def dist(p1,p2):
 
     return res
 
-def get_accuracy(train : pd.DataFrame, test: pd.DataFrame) -> float:    
+def get_accuracy(y_actual : pd.DataFrame, y_pred: pd.DataFrame) -> float:    
     tp = 0 
     tn = 0
     fp = 0 
     fn = 0
-    for i,v in train.items():
-        if test[i] == 1: 
-            if test[i] == train[i]:
+    for i,v in y_actual.items():
+        if y_pred[i] == '1': 
+            if y_pred[i] == y_actual[i]:
                 tp += 1
             else:
                 fp += 1
         else:
-            if test[i] == train[i]:
+            if y_pred[i] == y_actual[i]:
                 tn += 1
             else:
-                fp += 1
-    return (tp+tn)/(tp+tn+fp+fn)
+                fn += 1
+    accuracy = (tp+tn)/(tp+tn+fp+fn)
+    precision = (tp)/(tp+fn)
+    recall = (tp)/(tp+fp)
+    return accuracy,precision,recall
 
 def one_nn(df:pd.DataFrame):
     #5 fold validation
@@ -61,7 +64,10 @@ def one_nn(df:pd.DataFrame):
         train_actual = df.iloc[(i*1000):1000*(i+1)]
         y_train = train_actual['Prediction']
         accuracy.append(get_accuracy(y_train,test['Y_pred']))
-    print('Accuracy for 5 fold validation:', np.average(accuracy))
+    print('Metrics for 5 fold validation:', accuracy)
+    with open('./dataset/output.txt', 'w') as f: 
+        for k in accuracy.items():
+            f.write(' '.join([str(i)for i in k]) + " " + datetime.now() + "\n")
 
 def compute_distance_matrix(df: pd.DataFrame) -> None:
     prev=time.time()
