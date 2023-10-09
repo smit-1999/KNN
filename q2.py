@@ -40,7 +40,6 @@ def get_metrics(y_actual : pd.DataFrame, y_pred: pd.DataFrame) -> float:
                 tn += 1
             else:
                 fn += 1
-    print(tp,fp,tn,fn)
     accuracy = (tp+tn)/(tp+tn+fp+fn)
     precision = (tp)/(tp+fn)
     recall = (tp)/(tp+fp)
@@ -71,7 +70,7 @@ def one_nn(df:pd.DataFrame):
         for k in metrics:
             f.write(' '.join([str(i)for i in k]) + " " + str(datetime.now()) + "\n")
 
-def knn(df:pd.DataFrame, k: int)->None:
+def knn(df:pd.DataFrame, k: int)->list:
     metrics = []
     # df=df.head(50)
     for i in range(0,5):
@@ -102,6 +101,7 @@ def knn(df:pd.DataFrame, k: int)->None:
     with open('./dataset/output.txt', 'a') as f: 
         for k in metrics:
             f.write(' '.join([str(i)for i in k]) + " " + str(datetime.now()) + "\n")
+    return metrics
 
 def compute_distance_matrix(df: pd.DataFrame) -> None:
     prev=time.time()
@@ -143,9 +143,27 @@ if __name__ == "__main__":
 
 
     #one_nn(df)
-    k = 1
-    while k <= 7:
-        knn(df, k)
-        k += 2
+    k_metrics = []
+    x = [1,3,5,7,10]
+
+    for k in x:
+        start = time.time()
+        print('Computation began for k :', k)
+        metrics = knn(df, k)
+        print('Computation for k :', k, 'took', time.time()-start)
+        _avg = np.average([i for i,j,k in metrics])
+        k_metrics.append(_avg)
+        #k_metrics.append(metrics)
+        print(k,' ' , metrics)
+        
+
     
+    y=k_metrics
+    print('X,y',x,y)
+    plt.plot(x,y)
+    plt.xlabel('K')
+    plt.ylabel('Accuracy')
+    plt.legend
+    plt.show()
+
     
