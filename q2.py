@@ -161,6 +161,7 @@ if __name__ == "__main__":
     y=k_metrics
     print('X,y',x,y)
     plt.plot(x,y)
+    plt.scatter(x,y)
     plt.xlabel('K')
     plt.ylabel('Accuracy')
     plt.legend
